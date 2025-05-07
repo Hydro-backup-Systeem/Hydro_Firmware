@@ -1,56 +1,62 @@
-.vscode
-.venvs
-.ai
+# Ignore build output and debug folders
+**/Debug/
+**/build/
+**/Build/
 
-#settings
-.settings/
+# STM32CubeIDE project files (optional)
+*.launch
+*.uvoptx
+*.uvprojx
+*.ioc
+*.project
+*.cproject
+*.log
 
-#metadata
-.metadata/
-
-#Debug
-Debug/
-debug/
-Release/
-release
-
-# Prerequisites
-*.d
-
-# Object files
+# Compiled object files and binaries
 *.o
-*.ko
-*.obj
 *.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
 *.hex
 *.bin
+*.map
+*.d
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+# Backup and temp files
+*~
+*.swp
+*.bak
+*.tmp
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Mac OS system files
+.DS_Store
+**/__MACOSX/
+
+# Model training data and generated models
+custom_AI_model/data/
+custom_AI_model/models/
+
+# Ignore specific X-CUBE-AI generated files if they get rebuilt
+**/X-CUBE-AI/Lib/
+**/X-CUBE-AI/App/network*.c
+**/X-CUBE-AI/App/network*.h
+
+# Ignore IDE-specific metadata
+.vscode/
+.idea/
+
+# Ignore user-specific context/settings
+*.user
+*.suo
+*.userprefs
+
+# Auto generated library files
+firmware/Drivers/BSP/
+firmware/Drivers/CMSIS/
+firmware/Drivers/STM32U5xx_HAL_Driver/
+firmware/Drivers/X-CUBE-AI/
+
+firmware/Middlewares/
