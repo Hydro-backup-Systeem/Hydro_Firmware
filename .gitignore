@@ -30,6 +30,7 @@
 __pycache__/
 *.pyc
 *.pyo
+.venv/
 
 # Mac OS system files
 .DS_Store

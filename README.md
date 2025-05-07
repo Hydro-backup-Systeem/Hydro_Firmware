@@ -5,7 +5,7 @@
 
 1) Define sensor in PacketTypes enum
 
-**(./firmware/Core/Inc/Lib/packet.h)[./firmware/Core/Inc/Lib/packet.h]**
+[**./firmware/Core/Inc/Lib/packet.h**](./firmware/Core/Inc/Lib/packet.h)
 ```c++
 enum class PacketTypes {
   MSG = 0,    // MSG to be spoken
@@ -68,7 +68,8 @@ void XXXTask(void* pvParameters) {
 
 3) Create the task
 
-**(./firmware/Core/Src/context.cpp)[./firmware/Core/Src/context.cpp]**
+[**./firmware/Core/Src/context.cpp**](./firmware/Core/Src/context.cpp)
+
 ```c++
 // ...
 
