@@ -99,7 +99,7 @@ void schedule_tasks(void) {
     while (true) {
       const char* msg = "Oi pizza boi";
 
-      ctx->packetHandler->send((uint8_t*)msg, sizeof(msg), PacketTypes::MSG);
+      ctx->packetHandler->send((uint8_t*)msg, strlen(msg), PacketTypes::MSG);
       BSP_LED_Toggle(LED_BLUE);
 
       vTaskDelay(pdMS_TO_TICKS(11020));

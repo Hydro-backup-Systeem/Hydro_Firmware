@@ -115,7 +115,6 @@ void PacketHandler::process_fragments(std::vector<packet_t*>& frags, bool deciph
       // finally fire the callback on the byte buffer:
       msg_callback(raw.get(), total);
       break;
-
     }
 
     case PacketTypes::ENCRYP: {
@@ -226,49 +225,69 @@ void PacketHandler::send(uint8_t* data, uint32_t size, PacketTypes type) {
 
   // 4) Pad to 16‑byte boundary for AES
   uint32_t paddedSizeBytes = ((size + 15) / 16) * 16;
-  configASSERT(paddedSizeBytes >= size);
-
   uint32_t paddedWordCount = paddedSizeBytes / 4;
 
   // 5) Allocate temporary buffers
-  auto plaintext  = std::make_unique<uint32_t[]>(paddedWordCount);
-  auto ciphertext = std::make_unique<uint32_t[]>(paddedWordCount);
-  configASSERT(plaintext && ciphertext);
+  std::unique_ptr<uint8_t[]> raw_plain  = std::make_unique<uint8_t[]>(paddedSizeBytes);
+  std::unique_ptr<uint32_t[]> word_buff = std::make_unique<uint32_t[]>(paddedWordCount);
 
-  // 6) Zero them, then copy in exactly 'size' bytes
-  memset(plaintext.get(),  0, paddedSizeBytes);
-  memset(ciphertext.get(), 0, paddedSizeBytes);
-  configASSERT(size <= paddedSizeBytes);
-  memcpy(plaintext.get(), data, size);
-  memset(ciphertext.get(), 0x00, paddedSizeBytes);
+  // 6) PKCS#7 padding:
+  uint8_t padding_value = (uint8_t)paddedSizeBytes - size;
 
+  memset(raw_plain.get(), padding_value, paddedSizeBytes);
+  memcpy(raw_plain.get(), data, size);
+
+  // Pack raw_plain into word_buff (big-endian words)
+  for (uint32_t i = 0; i < paddedWordCount; i++) {
+    word_buff[i] = (uint32_t)raw_plain[4*i + 0] << 24
+                 | (uint32_t)raw_plain[4*i + 1] << 16
+                 | (uint32_t)raw_plain[4*i + 2] <<  8
+                 | (uint32_t)raw_plain[4*i + 3] <<  0;
+  }
+
+  // Make sure we are using the correct IV
   CRYP_ConfigTypeDef conf;
   HAL_CRYP_GetConfig(&hcryp, &conf);
+
   conf.pInitVect = IV_Send;
   HAL_CRYP_SetConfig(&hcryp, &conf);
 
-  // 7) Encrypt
+  // 7) Encrypt in place
   HAL_StatusTypeDef crypRes = HAL_CRYP_Encrypt(
     &hcryp,
-    plaintext.get(),
+    word_buff.get(),
     paddedWordCount,
-    ciphertext.get(),
+    word_buff.get(),
     1000
   );
 
   configASSERT(crypRes == HAL_OK);
 
+  // Unpack the buffer
+  auto raw_cipher = std::move(raw_plain);
+  for (uint32_t i = 0; i < paddedWordCount; i++) {
+    raw_cipher[4*i + 0] = (word_buff[i] >> 24) & 0xFF;
+    raw_cipher[4*i + 1] = (word_buff[i] >> 16) & 0xFF;
+    raw_cipher[4*i + 2] = (word_buff[i] >>  8) & 0xFF;
+    raw_cipher[4*i + 3] = (word_buff[i] >>  0) & 0xFF;
+  }
+
   DEBUGP("Cipher:");
-  for (uint32_t i = 0; i < paddedWordCount; i++) DEBUG_UINT_HEX(" ", ciphertext.get()[i]);
+  for (uint32_t i = 0; i < paddedSizeBytes; i++) {
+    DEBUG_UINT_HEX(" ", raw_cipher.get()[i]);
+    if ((i+1)%16==0) DEBUGLN("");
+  }
   DEBUGLN("");
 
   // 8) Fragment and build packets
-  uint32_t remaining    = paddedSizeBytes;
   uint32_t offset       = 0;
+  uint32_t remaining    = paddedSizeBytes;
   uint32_t rawFragments = (paddedSizeBytes + MAX_SIZE - 1) / MAX_SIZE;
+
   configASSERT(rawFragments <= 0xFF);
-  uint8_t totalFragments = static_cast<uint8_t>(rawFragments);
+
   uint8_t fragIdx        = 0;
+  uint8_t totalFragments = static_cast<uint8_t>(rawFragments);
 
   while (remaining) {
     // determine this fragment’s size
@@ -293,7 +312,7 @@ void PacketHandler::send(uint8_t* data, uint32_t size, PacketTypes type) {
     // safe copy into pkt->data
     configASSERT(packetLen <= sizeof(pkt->data));
     memcpy(pkt->data,
-           reinterpret_cast<uint8_t*>(ciphertext.get()) + offset,
+           raw_cipher.get() + offset,
            packetLen);
 
     pkt->checksum = compute_checksum(pkt, packetLen);
