@@ -163,10 +163,7 @@ header file. */
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
-#define USE_FreeRTOS_HEAP_5    1
-#define configUSE_STATS_FORMATTING_FUNCTIONS 1
 
-#define configUSE_TRACE_FACILITY 1
 #define configCHECK_FOR_STACK_OVERFLOW 2
 
 /* USER CODE END Defines */
