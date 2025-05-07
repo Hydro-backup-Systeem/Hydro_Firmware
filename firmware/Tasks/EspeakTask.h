@@ -21,8 +21,11 @@ struct array_t {
 
 #define ESPEAK_TASK_NAME "Espeak_t"
 
-static StaticTask_t  xEspeakTaskTCB;
-static StackType_t   xEspeakTaskStack[20 * 1024 / sizeof(StackType_t)];
+// 48 kBytes of stack memory
+#define ESPEAK_T_STACK_SIZE (48 * 1024 / sizeof(StackType_t))
+
+extern StaticTask_t  xEspeakTaskTCB;
+extern StackType_t   xEspeakTaskStack[ESPEAK_T_STACK_SIZE];
 
 void EspeakTask(void *pvParameters);
 

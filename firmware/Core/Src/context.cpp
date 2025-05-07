@@ -48,7 +48,7 @@ void schedule_tasks(void) {
     HAL_UART_Transmit(&huart1, d.data, len, 1000);
     DEBUGLN("");
 
-//    xQueueSend(ctx.synthQueue, &d, portMAX_DELAY);
+    xQueueSend(ctx.synthQueue, &d, portMAX_DELAY);
   });
 
   ctx.lora = &lora;
@@ -56,7 +56,7 @@ void schedule_tasks(void) {
   lora.set_long_range();
 
 
-#ifdef NO
+#ifdef DEBUG
   // Debuging without having RiPi
   xTaskCreate([](void* pvParameters) {
     auto* ctx = static_cast<SharedContext_t*>(pvParameters);
@@ -65,7 +65,7 @@ void schedule_tasks(void) {
       vTaskDelay(pdMS_TO_TICKS(1000));
 
       // Hardcoded data for testing
-      const char* testData = "This is a test packet data !!";
+      const char* testData = "meow meow im a cat";
 
       // Create a new packet and populate it with hardcoded data
       packet_t* pkt = new packet_t;
@@ -122,15 +122,15 @@ void schedule_tasks(void) {
     PRIORITY_DEFAULT,
     NULL);
 
-//  TaskHandle_t handle = xTaskCreateStatic(
-//    EspeakTask,
-//    ESPEAK_TASK_NAME,
-//    sizeof(xEspeakTaskStack)/sizeof(xEspeakTaskStack[0]),
-//    &ctx,
-//    PRIORITY_HIGHEST,
-//    xEspeakTaskStack,
-//    &xEspeakTaskTCB
-//  );
+  xTaskCreateStatic(
+    EspeakTask,
+    ESPEAK_TASK_NAME,
+    sizeof(xEspeakTaskStack)/sizeof(xEspeakTaskStack[0]),
+    &ctx,
+    PRIORITY_HIGHEST,
+    xEspeakTaskStack,
+    &xEspeakTaskTCB
+  );
 }
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
