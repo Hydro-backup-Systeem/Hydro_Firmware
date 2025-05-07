@@ -20,16 +20,6 @@
 __ALIGN_BEGIN uint32_t PacketHandler::IV_Send[4] __ALIGN_END = {0};
 __ALIGN_BEGIN uint32_t PacketHandler::IV_Receive[4] __ALIGN_END = {0};
 
-void swap_endianness(uint32_t* data, std::size_t word_count) {
-  for (std::size_t i = 0; i < word_count; ++i) {
-    uint32_t v = data[i];
-    data[i] = ((v & 0x000000FFu) << 24) |
-              ((v & 0x0000FF00u) <<  8) |
-              ((v & 0x00FF0000u) >>  8) |
-              ((v & 0xFF000000u) >> 24);
-  }
-}
-
 PacketHandler::PacketHandler(LoRa* lora) : lora(lora), msg_callback(nullptr) {}
 
 void PacketHandler::init() {
@@ -329,7 +319,6 @@ void PacketHandler::send(uint8_t* data, uint32_t size, PacketTypes type) {
     send_pkt(pkt);
   }
 }
-
 
 void PacketHandler::receive() {
   uint8_t error = 0;

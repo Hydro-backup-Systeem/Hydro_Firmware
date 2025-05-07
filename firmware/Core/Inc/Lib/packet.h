@@ -13,8 +13,8 @@
 #define PACKET_MAX_SIZE 119
 
 enum class PacketTypes {
-    MSG = 0,    // Sending a new message
-    ENCRYP, // Send counter for AES over plain text
+    MSG = 0,    // MSG to be spoken
+    ENCRYP,     // Send counter for AES over plain text
 
     ACK,  // Acknowledge a whole message
     NACK, // Not Acknowledge, data should be list of missing fragments

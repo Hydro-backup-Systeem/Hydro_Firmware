@@ -111,7 +111,7 @@ void schedule_tasks(void) {
     SX1276_IRQ_Handle_TASK_NAME,
     128,
     &ctx,
-    PRIORITY_HIGHEST,
+    PRIORITY_HIGHEST + 1,
     NULL);
 
   xTaskCreate(
@@ -131,6 +131,10 @@ void schedule_tasks(void) {
     xEspeakTaskStack,
     &xEspeakTaskTCB
   );
+
+  // Begin sensor reading tasks
+
+  // End sensor reading tasks
 }
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
