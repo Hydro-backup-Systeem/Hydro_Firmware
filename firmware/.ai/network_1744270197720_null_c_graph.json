@@ -107,7 +107,7 @@
         }
     },
     "activations_alignment": 4,
-    "arguments": "generate --target stm32u5 --name network_1744270197720 -m /home/joey/Documents/school/HydroBackupSystem/Hydro_Firmware/custom_AI_model/models/model_quantized.tflite --compression none --verbosity 1 --workspace /tmp/mxAI_workspace1569727341933717963098586390868397 --output /home/joey/.stm32cubemx/network_1744270197720_output",
+    "arguments": "generate --target stm32u5 --name network_1744270197720 -m /home/joey/Documents/school/HydroBackupSystem/Hydro_Firmware/custom_AI_model/models/model_quantized.tflite --compression none --verbosity 1 --workspace /tmp/mxAI_workspace11970519596568022423534984801947 --output /home/joey/.stm32cubemx/network_1744270197720_output",
     "c_activations_count": 1,
     "c_arrays": [
         {
@@ -1519,7 +1519,7 @@
         ]
     },
     "data_alignment": 4,
-    "date_time": "2025-05-06T15:01:23+0200",
+    "date_time": "2025-05-07T16:04:01+0200",
     "inputs": [
         "serving_default_input_layer0_output"
     ],

@@ -11,3 +11,5 @@
 - [STM32U5-series reference manual](./rm0456-stm32u5-series-armbased-32bit-mcus-stmicroelectronics.pdf)
 
 - [STM32U5-series Nucleo dev board docs](./um2861-stm32u5-nucleo144-board-mb1549-stmicroelectronics.pdf)
+
+- [FreeRTOS documentation](https://freertos.org/Why-FreeRTOS)

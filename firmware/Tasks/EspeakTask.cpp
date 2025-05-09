@@ -23,21 +23,22 @@ void EspeakTask(void *pvParameters) {
 
   while (true) {
     if (xQueueReceive(ctx->synthQueue, &buffer, portMAX_DELAY)) {
-      espeak_Synth(
-          buffer.data,
-          buffer.len,
-          0,
-          POS_WORD,
-          0,
-          espeakCHARS_AUTO | espeakENDPAUSE,
-          NULL,
-          NULL
-      );
 
-      UBaseType_t unused_words = uxTaskGetStackHighWaterMark(NULL);
-      UBaseType_t used_bytes = (ESPEAK_T_STACK_SIZE - unused_words) * sizeof(StackType_t);
-
-      DEBUG_INT_LN("Used stack: ", used_bytes);
+//      espeak_Synth(
+//          buffer.data,
+//          buffer.len,
+//          0,
+//          POS_WORD,
+//          0,
+//          espeakCHARS_AUTO | espeakENDPAUSE,
+//          NULL,
+//          NULL
+//      );
+//
+//      UBaseType_t unused_words = uxTaskGetStackHighWaterMark(NULL);
+//      UBaseType_t used_bytes = (ESPEAK_T_STACK_SIZE - unused_words) * sizeof(StackType_t);
+//
+//      DEBUG_INT_LN("Used stack: ", used_bytes);
     }
   }
 }

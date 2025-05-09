@@ -291,11 +291,15 @@ static int SetAlternateTranslator(const char *new_language, Translator **transla
 
 int SetTranslator2(const char *new_language)
 {
+//  // We do not have alternate translators
+//  return 0;
 	return SetAlternateTranslator(new_language, &translator2, translator2_language);
 }
 
 int SetTranslator3(const char *new_language)
 {
+//  // We do not have alternate translators
+//  return 0;
 	return SetAlternateTranslator(new_language, &translator3, translator3_language);
 }
 
@@ -421,7 +425,7 @@ static int TranslateWord2(Translator *tr, char *word, WORD_TAB *wtab, int pre_pa
 				memcpy(word, word_copy, word_copy_len);
 
 				const char *new_language;
-				new_language = (char *)(&p[1]);
+				new_language = ESPEAKNG_DEFAULT_VOICE; // Only use default voice
 				if (new_language[0] == 0)
 					new_language = ESPEAKNG_DEFAULT_VOICE;
 

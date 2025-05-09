@@ -30,6 +30,11 @@ void SX1276_IRQ_Handle_Task(void* pvParameters) {
 
     if (bits & SX1276_RX_DONE) {
       ctx->packetHandler->receive();
+
+      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+      vTaskNotifyGiveFromISR((TaskHandle_t)ctx->UpdateTaskHandle, &xHigherPriorityTaskWoken);
+      portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
       BSP_LED_Toggle(LED_BLUE);
     }
 

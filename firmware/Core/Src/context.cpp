@@ -19,6 +19,7 @@
 // Task includes
 #include "shared_context.h"
 
+#include <CleanTask.h>
 #include <UpdateTask.h>
 #include <EspeakTask.h>
 #include <SX1276_IRQ_Handle_Task.h>
@@ -56,16 +57,16 @@ void schedule_tasks(void) {
   lora.set_long_range();
 
 
-#ifdef DEBUG
+#ifdef No
   // Debuging without having RiPi
   xTaskCreate([](void* pvParameters) {
     auto* ctx = static_cast<SharedContext_t*>(pvParameters);
 
     while (true) {
-      vTaskDelay(pdMS_TO_TICKS(1000));
+      vTaskDelay(pdMS_TO_TICKS(10000));
 
       // Hardcoded data for testing
-      const char* testData = "meow meow im a cat";
+      const char* testData = "This is a test";
 
       // Create a new packet and populate it with hardcoded data
       packet_t* pkt = new packet_t;
@@ -89,6 +90,8 @@ void schedule_tasks(void) {
       bucket->frags.push_back(pkt);
 
       ctx->packetHandler->received[pkt->message_id] = bucket;
+
+      BSP_LED_Toggle(LED_BLUE);
     }
   }, "DebugRX_t", 256, &ctx, PRIORITY_DEFAULT, NULL);
 #endif
@@ -100,9 +103,8 @@ void schedule_tasks(void) {
       const char* msg = "Oi pizza boi";
 
       ctx->packetHandler->send((uint8_t*)msg, strlen(msg), PacketTypes::MSG);
-      BSP_LED_Toggle(LED_BLUE);
 
-      vTaskDelay(pdMS_TO_TICKS(11020));
+      vTaskDelay(pdMS_TO_TICKS(3020));
     }
   }, "TestTx_t", 256, &ctx, PRIORITY_HIGH, NULL);
 
@@ -120,7 +122,15 @@ void schedule_tasks(void) {
     128,
     &ctx,
     PRIORITY_DEFAULT,
-    NULL);
+    &ctx.UpdateTaskHandle);
+
+  xTaskCreate(
+      CleanTask,
+      Clean_TASK_NAME,
+      128,
+      &ctx,
+      PRIORITY_DEFAULT,
+      NULL);
 
   xTaskCreateStatic(
     EspeakTask,

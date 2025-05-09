@@ -69,6 +69,7 @@ void PacketHandler::process_fragments(std::vector<packet_t*>& frags, bool deciph
   // Reassamble the fragments
   uint32_t offset = 0;
   std::unique_ptr<uint8_t[]> raw = std::make_unique<uint8_t[]>(total);
+
   for (auto* p : frags) {
     memcpy(raw.get() + offset, p->data, p->lenght);
     offset += p->lenght;
@@ -89,6 +90,11 @@ void PacketHandler::process_fragments(std::vector<packet_t*>& frags, bool deciph
                    | (uint32_t)raw[4*i + 2] <<  8
                    | (uint32_t)raw[4*i + 3] <<  0;
         }
+
+        CRYP_ConfigTypeDef conf;
+        HAL_CRYP_GetConfig(&hcryp, &conf);
+        conf.pInitVect = IV_Receive;
+        HAL_CRYP_SetConfig(&hcryp, &conf);
 
         // decrypt in‑place
         HAL_CRYP_Decrypt(&hcryp, buf32.get(), wordCount, buf32.get(), 1000);
@@ -139,7 +145,7 @@ void PacketHandler::process_fragments(std::vector<packet_t*>& frags, bool deciph
   }
 }
 
-void PacketHandler::poll() {
+void PacketHandler::check_and_process() {
   for (message_bucket*& bucket : received) {
     if (    bucket == nullptr
         || !is_complete(bucket->frags)) continue;

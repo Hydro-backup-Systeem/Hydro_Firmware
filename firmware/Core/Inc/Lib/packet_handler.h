@@ -46,7 +46,7 @@ class PacketHandler {
 
   public:
     // Regular processing methods.
-    void poll();
+    void check_and_process();
     void clean();
     void receive();
     void send(uint8_t* data, uint32_t size, PacketTypes type);

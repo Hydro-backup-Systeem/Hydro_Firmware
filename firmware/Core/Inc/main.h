@@ -42,7 +42,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-#define USE_ENCRYPTION false
+#define USE_ENCRYPTION true
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

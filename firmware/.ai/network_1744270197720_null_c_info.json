@@ -1292,44 +1292,44 @@
   ],
   "environment": {
     "generated_model": {
-      "generated_time": "2025-05-06T15:01:23+0200",
+      "generated_time": "2025-05-07T16:04:01+0200",
       "model_files": [
         {
           "name": "network_1744270197720_data_params.h",
-          "signature": "0x7def6ec673bdc4a58ee66c4c24ad9b2c"
+          "signature": "0x6bb5c698efc2ce779c2e5f3ccf9143a8"
         },
         {
           "name": "network_1744270197720_data_params.c",
-          "signature": "0x673a3cbfb3a7c75ed8f03e65e3c91210"
+          "signature": "0xafa79bc7a6087d22e770569507770938"
         },
         {
           "name": "network_1744270197720_data.h",
-          "signature": "0xed1a8b6ecfe6f7e7e50bafa602643e08"
+          "signature": "0x017727fe6a445df4fa872a26042835e3"
         },
         {
           "name": "network_1744270197720_data.c",
-          "signature": "0x4ee2a579282996b8c0fa9ac0d6edefc7"
+          "signature": "0x39af134acbf17c1dd6ddedbc3474386a"
         },
         {
           "name": "network_1744270197720_config.h",
-          "signature": "0x1f3845c6a209c683be866db51d7c2607"
+          "signature": "0x70959b1b85b33cd4b0d1a3fdee18095d"
         },
         {
           "name": "network_1744270197720.h",
-          "signature": "0x4302409b971cca4c41949fbaab885de3"
+          "signature": "0x19d5ef94f9f7c8c5cb405e6d7a07860b"
         },
         {
           "name": "network_1744270197720.c",
-          "signature": "0x8bebfb7ec9be89254ae83480e7b77d3b"
+          "signature": "0x89dd35e4a67dde8fc72c99435c5d73f2"
         }
       ],
       "name": "network_1744270197720"
     },
-    "network_signature": "0x1c77a2f4a5d1f15e",
+    "network_signature": "0xfd98dc884822ed67",
     "test_name": "",
     "tools": [
       {
-        "arguments": "generate --target stm32u5 --name network_1744270197720 -m /home/joey/Documents/school/HydroBackupSystem/Hydro_Firmware/custom_AI_model/models/model_quantized.tflite --compression none --verbosity 1 --workspace /tmp/mxAI_workspace1569727341933717963098586390868397 --output /home/joey/.stm32cubemx/network_1744270197720_output",
+        "arguments": "generate --target stm32u5 --name network_1744270197720 -m /home/joey/Documents/school/HydroBackupSystem/Hydro_Firmware/custom_AI_model/models/model_quantized.tflite --compression none --verbosity 1 --workspace /tmp/mxAI_workspace11970519596568022423534984801947 --output /home/joey/.stm32cubemx/network_1744270197720_output",
         "environment": [
           "STATS_TYPE=X-CUBE-AI"
         ],

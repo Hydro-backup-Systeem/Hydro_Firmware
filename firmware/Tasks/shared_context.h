@@ -28,6 +28,8 @@ typedef struct {
     QueueHandle_t synthQueue;
     EventGroupHandle_t sx1276_irq;
 
+    TaskHandle_t UpdateTaskHandle;
+
     LoRa* lora;
     PacketHandler* packetHandler;
 } SharedContext_t;
