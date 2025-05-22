@@ -177,7 +177,7 @@ void PostSleepProcessing(uint32_t ulExpectedIdleTime);
 /* The configPRE_SLEEP_PROCESSING() and configPOST_SLEEP_PROCESSING() macros
 allow the application writer to add additional code before and after the MCU is
 placed into the low power state respectively. */
-#if configUSE_TICKLESS_IDLE == 0
+#if configUSE_TICKLESS_IDLE == 1
 #define configPRE_SLEEP_PROCESSING(__x__)                           \
                                        do {                         \
                                          PreSleepProcessing(__x__); \

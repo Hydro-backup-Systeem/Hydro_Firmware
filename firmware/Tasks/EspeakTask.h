@@ -15,7 +15,7 @@
 
 template<typename T>
 struct array_t {
-  T* data;
+  T data;
   size_t len;
 };
 

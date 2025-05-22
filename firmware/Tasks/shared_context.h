@@ -25,6 +25,8 @@ constexpr EventBits_t SX1276_RX_DONE = (1 << 0);
 constexpr EventBits_t SX1276_TX_DONE = (1 << 1);
 
 typedef struct {
+    QueueHandle_t flagQueue;
+    QueueHandle_t presetQueue;
     QueueHandle_t synthQueue;
     EventGroupHandle_t sx1276_irq;
 

@@ -10,6 +10,7 @@
 
 #include <array>
 #include <vector>
+#include <memory>
 #include <cstdint>
 #include <unordered_map>
 
@@ -34,7 +35,7 @@ typedef struct message_bucket_t {
   std::vector<packet_t*> frags;
 } message_bucket;
 
-typedef void(*msg_data_callback_t)(uint8_t* data, size_t len);
+typedef void(*msg_data_callback_t)(std::shared_ptr<uint8_t[]> data, size_t len);
 
 class PacketHandler {
   public:

@@ -6,13 +6,19 @@
 #include "spi.h"
 #include "gpio.h"
 
+#include "FreeRTOS.h"
+
 LoRa::LoRa() : mode(LoRaMode::Receive) { };
 
 void LoRa::init() {
   mtx = xSemaphoreCreateMutex();
+  HAL_GPIO_WritePin(LoRa_Reset_GPIO_Port, LoRa_Reset_Pin, GPIO_PIN_SET);
+  vTaskDelay(pdMS_TO_TICKS(10));
 
-  uint8_t res = lora_init(&lora, &hspi3, SPI_NSS_GPIO_Port, SPI_NSS_Pin, LORA_BASE_FREQUENCY_EU);
+  volatile uint8_t res = lora_init(&lora, &hspi3, SPI_NSS_GPIO_Port, SPI_NSS_Pin, LORA_BASE_FREQUENCY_EU);
+
   configASSERT(res == LORA_OK);
+
 
   set_receive_mode();
 }
@@ -25,7 +31,7 @@ bool LoRa::set_long_range() {
 
   lora_mode_sleep(&lora);
 
-  lora_set_spreading_factor(&lora, 8);
+  lora_set_spreading_factor(&lora, 9);
   lora_set_signal_bandwidth(&lora, LORA_BANDWIDTH_62_5_KHZ);
   lora_set_coding_rate(&lora, LORA_CODING_RATE_4_8);
   lora_set_tx_power(&lora, 20);

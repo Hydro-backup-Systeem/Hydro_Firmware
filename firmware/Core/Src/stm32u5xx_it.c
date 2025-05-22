@@ -163,17 +163,17 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles EXTI Line3 interrupt.
+  * @brief This function handles EXTI Line4 interrupt.
   */
-void EXTI3_IRQHandler(void)
+void EXTI4_IRQHandler(void)
 {
-  /* USER CODE BEGIN EXTI3_IRQn 0 */
+  /* USER CODE BEGIN EXTI4_IRQn 0 */
 
-  /* USER CODE END EXTI3_IRQn 0 */
+  /* USER CODE END EXTI4_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(LoRa_DIO0_Pin);
-  /* USER CODE BEGIN EXTI3_IRQn 1 */
+  /* USER CODE BEGIN EXTI4_IRQn 1 */
   rx_tx_callback();
-  /* USER CODE END EXTI3_IRQn 1 */
+  /* USER CODE END EXTI4_IRQn 1 */
 }
 
 /**
@@ -182,11 +182,11 @@ void EXTI3_IRQHandler(void)
 void EXTI13_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI13_IRQn 0 */
-//
+
   /* USER CODE END EXTI13_IRQn 0 */
   BSP_PB_IRQHandler(BUTTON_USER);
   /* USER CODE BEGIN EXTI13_IRQn 1 */
-//
+
   /* USER CODE END EXTI13_IRQn 1 */
 }
 

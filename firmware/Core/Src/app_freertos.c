@@ -60,14 +60,22 @@ const osThreadAttr_t defaultTask_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 /* USER CODE BEGIN PREPOSTSLEEP */
+#include "stm32u5xx_hal_pwr.h"
+
+extern void SystemClock_Config(void);
+
 __weak void PreSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-/* place for user code */
+  BSP_LED_On(LED_RED);
+//  HAL_SuspendTick();
+//  HAL_PWREx_EnterSTOP2Mode(PWR_STOPENTRY_WFI);
 }
 
 __weak void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-/* place for user code */
+  BSP_LED_Off(LED_RED);
+//  SystemClock_Config();
+//  HAL_ResumeTick();
 }
 /* USER CODE END PREPOSTSLEEP */
 

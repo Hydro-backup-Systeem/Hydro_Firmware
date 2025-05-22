@@ -5,7 +5,8 @@
  *    Author: joey
  */
 
-#include <math_utils.h>
+#include "math_utils.h"
+#include "shared_context.h"
 #include "packet_handler.h"
 
 #include "main.h"
@@ -16,6 +17,8 @@
 #include <algorithm>
 
 #include <memory>
+
+extern SharedContext_t ctx;
 
 __ALIGN_BEGIN uint32_t PacketHandler::IV_Send[4] __ALIGN_END = {0};
 __ALIGN_BEGIN uint32_t PacketHandler::IV_Receive[4] __ALIGN_END = {0};
@@ -68,7 +71,7 @@ void PacketHandler::process_fragments(std::vector<packet_t*>& frags, bool deciph
 
   // Reassamble the fragments
   uint32_t offset = 0;
-  std::unique_ptr<uint8_t[]> raw = std::make_unique<uint8_t[]>(total);
+  std::shared_ptr<uint8_t[]> raw = std::make_shared<uint8_t[]>(total);
 
   for (auto* p : frags) {
     memcpy(raw.get() + offset, p->data, p->lenght);
@@ -77,40 +80,59 @@ void PacketHandler::process_fragments(std::vector<packet_t*>& frags, bool deciph
   }
   frags.clear();
 
+  uint8_t padding = 0;
+  uint8_t new_total = total;
+  if (decipher && type != PacketTypes::ENCRYP) {
+    // convert raw bytes → big‑endian word array
+    uint32_t wordCount = total / 4;
+    auto buf32 = std::make_unique<uint32_t[]>(wordCount);
+    for (uint32_t i = 0; i < wordCount; ++i) {
+      buf32[i] = (uint32_t)raw[4*i + 0] << 24
+               | (uint32_t)raw[4*i + 1] << 16
+               | (uint32_t)raw[4*i + 2] <<  8
+               | (uint32_t)raw[4*i + 3] <<  0;
+    }
+
+    CRYP_ConfigTypeDef conf;
+    HAL_CRYP_GetConfig(&hcryp, &conf);
+    conf.pInitVect = IV_Receive;
+    HAL_CRYP_SetConfig(&hcryp, &conf);
+
+    // decrypt in‑place
+    HAL_CRYP_Decrypt(&hcryp, buf32.get(), wordCount, buf32.get(), 1000);
+
+    // convert decrypted words back to bytes for the callback
+    for (uint32_t i = 0; i < wordCount; ++i) {
+      raw[4*i + 0] = (buf32[i] >> 24) & 0xFF;
+      raw[4*i + 1] = (buf32[i] >> 16) & 0xFF;
+      raw[4*i + 2] = (buf32[i] >>  8) & 0xFF;
+      raw[4*i + 3] = (buf32[i] >>  0) & 0xFF;
+    }
+
+    // Remove PKCS#7 padding
+    padding = raw[total - 1];
+
+    // Validate padding
+    if (!(padding == 0 || padding > 16)) {
+      new_total = new_total - padding;
+
+      for (uint32_t i = total - padding; i < total; i++) {
+        if (raw[i] != padding) {
+          // Invalid padding oh no
+          return;
+        }
+      }
+    }
+  }
+
   // Dispatch based on type
   switch (type) {
     case PacketTypes::MSG: {
-      if (msg_callback && decipher) {
-        // convert raw bytes → big‑endian word array
-        uint32_t wordCount = total / 4;
-        auto buf32 = std::make_unique<uint32_t[]>(wordCount);
-        for (uint32_t i = 0; i < wordCount; ++i) {
-          buf32[i] = (uint32_t)raw[4*i + 0] << 24
-                   | (uint32_t)raw[4*i + 1] << 16
-                   | (uint32_t)raw[4*i + 2] <<  8
-                   | (uint32_t)raw[4*i + 3] <<  0;
-        }
-
-        CRYP_ConfigTypeDef conf;
-        HAL_CRYP_GetConfig(&hcryp, &conf);
-        conf.pInitVect = IV_Receive;
-        HAL_CRYP_SetConfig(&hcryp, &conf);
-
-        // decrypt in‑place
-        HAL_CRYP_Decrypt(&hcryp, buf32.get(), wordCount, buf32.get(), 1000);
-
-        // convert decrypted words back to bytes for the callback
-        for (uint32_t i = 0; i < wordCount; ++i) {
-          raw[4*i + 0] = (buf32[i] >> 24) & 0xFF;
-          raw[4*i + 1] = (buf32[i] >> 16) & 0xFF;
-          raw[4*i + 2] = (buf32[i] >>  8) & 0xFF;
-          raw[4*i + 3] = (buf32[i] >>  0) & 0xFF;
-        }
+      if (msg_callback) {
+        // finally fire the callback on the byte buffer:
+        msg_callback(raw, new_total);
+        break;
       }
-
-      // finally fire the callback on the byte buffer:
-      msg_callback(raw.get(), total);
-      break;
     }
 
     case PacketTypes::ENCRYP: {
@@ -131,6 +153,19 @@ void PacketHandler::process_fragments(std::vector<packet_t*>& frags, bool deciph
       conf.pInitVect = IV_Receive;
       HAL_CRYP_SetConfig(&hcryp, &conf);
 
+      break;
+    }
+
+    case PacketTypes::FLAGS: {
+      // TODO: The ctx should not be used here actually
+      // TODO: Switch the correct flags....
+      xQueueSend(ctx.flagQueue, &raw[0], portMAX_DELAY);
+      break;
+    }
+
+    case PacketTypes::DICT: {
+      // TODO: The ctx should not be used here actually
+      xQueueSend(ctx.presetQueue, &raw[0], portMAX_DELAY);
       break;
     }
 
@@ -321,6 +356,8 @@ void PacketHandler::send(uint8_t* data, uint32_t size, PacketTypes type) {
     remaining -= packetLen;
   }
 
+  vTaskDelay(pdMS_TO_TICKS(100));
+
   for (auto pkt : bucket->frags) {
     send_pkt(pkt);
   }
@@ -390,10 +427,10 @@ void PacketHandler::send_pkt(packet_t* pkt) {
 
   while (!succes) {
     succes = lora->send(buffer, pkt->lenght + 9);
-    vTaskDelay(pdMS_TO_TICKS(50));
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 
-  vTaskDelay(pdMS_TO_TICKS(50));
+  vTaskDelay(pdMS_TO_TICKS(250));
 }
 
 uint8_t PacketHandler::compute_checksum(packet_t* pkt, uint8_t len) {

@@ -75,13 +75,15 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define VBUS_SENSE_Pin GPIO_PIN_2
 #define VBUS_SENSE_GPIO_Port GPIOC
-#define LoRa_DIO0_Pin GPIO_PIN_3
-#define LoRa_DIO0_GPIO_Port GPIOA
-#define LoRa_DIO0_EXTI_IRQn EXTI3_IRQn
 #define UCPD_FLT_Pin GPIO_PIN_14
 #define UCPD_FLT_GPIO_Port GPIOB
+#define LoRa_Reset_Pin GPIO_PIN_8
+#define LoRa_Reset_GPIO_Port GPIOC
 #define SPI_NSS_Pin GPIO_PIN_9
 #define SPI_NSS_GPIO_Port GPIOC
+#define LoRa_DIO0_Pin GPIO_PIN_4
+#define LoRa_DIO0_GPIO_Port GPIOB
+#define LoRa_DIO0_EXTI_IRQn EXTI4_IRQn
 #define UCPD_DBn_Pin GPIO_PIN_5
 #define UCPD_DBn_GPIO_Port GPIOB
 

@@ -18,6 +18,9 @@ enum class PacketTypes {
 
     ACK,  // Acknowledge a whole message
     NACK, // Not Acknowledge, data should be list of missing fragments
+
+    FLAGS,
+    DICT,
 };
 
 typedef struct {

@@ -67,12 +67,14 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
 void BSP_PB_Callback(Button_TypeDef Button) {
+
 //  if (adcIndex != 0 || recording_done != 0) return;
 
-  // Start recording
-  BSP_LED_On(LED_BLUE);
-  HAL_TIM_Base_Start_IT(&htim2);
+//  // Start recording
+//  BSP_LED_On(LED_BLUE);
+//  HAL_TIM_Base_Start_IT(&htim2);
 }
 
 #ifdef __cplusplus

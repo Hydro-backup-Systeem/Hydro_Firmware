@@ -12,6 +12,12 @@
 *.cproject
 *.log
 
+# Ignore all wav files
+*.wav
+
+# Ignore large wav files
+./firmware/Test/Audio/*.h
+
 # Compiled object files and binaries
 *.o
 *.elf

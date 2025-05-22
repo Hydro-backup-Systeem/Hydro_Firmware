@@ -8,14 +8,16 @@
 #include "EspeakTask.h"
 #include "math_utils.h"
 
+#include "Audio/radio_receive.h"
+
 StaticTask_t  xEspeakTaskTCB;
 StackType_t   xEspeakTaskStack[ESPEAK_T_STACK_SIZE];
 
 void EspeakTask(void *pvParameters) {
   auto* ctx = static_cast<SharedContext_t*>(pvParameters);
 
-  array_t<uint8_t> buffer;
-
+  array_t<std::shared_ptr<uint8_t[]>> buffer;
+// There is something seriously wrong with the speech synthesis
   int result = espeak_Initialize(AUDIO_OUTPUT_SYNCHRONOUS, 500, NULL, 0);
   configASSERT(result);
 
@@ -23,22 +25,29 @@ void EspeakTask(void *pvParameters) {
 
   while (true) {
     if (xQueueReceive(ctx->synthQueue, &buffer, portMAX_DELAY)) {
+      HAL_SAI_Transmit(&hsai_BlockA1, (uint8_t *)(radio_receive), radio_receive_len, HAL_MAX_DELAY);
 
-//      espeak_Synth(
-//          buffer.data,
-//          buffer.len,
-//          0,
-//          POS_WORD,
-//          0,
-//          espeakCHARS_AUTO | espeakENDPAUSE,
-//          NULL,
-//          NULL
-//      );
-//
-//      UBaseType_t unused_words = uxTaskGetStackHighWaterMark(NULL);
-//      UBaseType_t used_bytes = (ESPEAK_T_STACK_SIZE - unused_words) * sizeof(StackType_t);
-//
-//      DEBUG_INT_LN("Used stack: ", used_bytes);
+      HAL_UART_Transmit(&huart1, (const uint8_t*)buffer.data.get(), buffer.len, 1000);
+
+      BSP_LED_Toggle(LED_RED);
+
+      espeak_Synth(
+          (const char*)buffer.data.get(),
+          buffer.len,
+          0,
+          POS_WORD,
+          0,
+          espeakCHARS_AUTO | espeakENDPAUSE,
+          NULL,
+          NULL
+      );
+
+      espeak_Synchronize();
+
+      UBaseType_t unused_words = uxTaskGetStackHighWaterMark(NULL);
+      UBaseType_t used_bytes = (ESPEAK_T_STACK_SIZE - unused_words) * sizeof(StackType_t);
+
+      DEBUG_INT_LN("Used stack: ", used_bytes);
     }
   }
 }
