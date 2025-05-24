@@ -4,12 +4,6 @@
 **/Build/
 
 # STM32CubeIDE project files (optional)
-*.launch
-*.uvoptx
-*.uvprojx
-*.ioc
-*.project
-*.cproject
 *.log
 
 # Ignore all wav files

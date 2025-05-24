@@ -156,11 +156,11 @@ void schedule_tasks(void) {
     while (true) {
       char buff[128];
 
-      sprintf(buff, "Race car ping: %d\n", i++);
+      sprintf(buff, "Race car message: %d\n", i++);
 
       ctx->packetHandler->send((uint8_t*)buff, strlen(buff), PacketTypes::MSG);
 
-      vTaskDelay(pdMS_TO_TICKS(3500));
+      vTaskDelay(pdMS_TO_TICKS(20000));
     }
   }, "TestTx_t", 256, &ctx, PRIORITY_HIGH, NULL);
 
